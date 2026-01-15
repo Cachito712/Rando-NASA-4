@@ -6,175 +6,151 @@
     <title>NASA Rando</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        :root {
-            --primary: #2563eb;
-            --text: #ffffff;
-        }
-
+        /* RESET & BASE */
         body, html {
             margin: 0; padding: 0;
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            height: 100%;
-            background-color: #000;
+            height: 100%; width: 100%;
+            font-family: sans-serif;
+            background-color: #000; /* Fond de secours */
         }
 
-        /* IMAGE DE FOND */
-        .hero-bg {
+        /* L'IMAGE DE FOND - Fixée au plus bas niveau */
+        .background-image {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: url('fond.jpg') no-repeat center center/cover;
-            z-index: -1;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: url('fond.jpg') no-repeat center center fixed;
+            background-size: cover;
+            z-index: 1; /* Couche 1 */
         }
 
-        /* BARRE DE NAVIGATION */
+        /* COUCHE DE CONTENU - Au dessus de l'image */
+        .ui-layer {
+            position: relative;
+            z-index: 10; /* Couche 10 */
+            min-height: 100vh;
+        }
+
+        /* NAVIGATION */
         nav {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 0 20px;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            position: fixed;
-            top: 0; width: 100%; height: 60px;
-            z-index: 9999; /* Très haut pour être au-dessus de tout */
-            box-sizing: border-box;
+            padding: 10px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            gap: 15px;
         }
 
-        .nav-center {
+        .menu-container {
             display: flex;
-            gap: 10px;
+            gap: 5px;
             overflow-x: auto;
-            scrollbar-width: none;
+            flex-grow: 1;
         }
-        .nav-center::-webkit-scrollbar { display: none; }
 
         /* BOUTONS MENUS */
-        .dropdown { position: relative; display: inline-block; }
+        .dropdown { position: relative; }
         
         .dropbtn {
-            background: none; border: none; color: white;
-            padding: 20px 10px; font-size: 12px; font-weight: bold;
-            text-transform: uppercase; cursor: pointer;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 13px;
             white-space: nowrap;
         }
 
-        /* SOUS-MENUS (CORRIGÉS) */
+        .dropbtn:hover { background: rgba(255,255,255,0.3); }
+
+        /* LISTE DÉROULANTE */
         .dropdown-content {
-            display: none; /* Caché par défaut */
+            display: none;
             position: absolute;
-            background: rgba(15, 23, 42, 0.98);
-            min-width: 260px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-            border-radius: 0 0 8px 8px;
-            z-index: 10000;
-            top: 60px; /* Aligné sous la nav */
+            background: #1a1a1a;
+            min-width: 250px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+            border-radius: 4px;
+            margin-top: 5px;
+            max-height: 400px;
+            overflow-y: auto;
         }
 
-        /* AFFICHER AU SURVOL */
-        .dropdown:hover .dropdown-content {
-            display: block !important;
-        }
+        /* Affichage quand on survole (PC) ou via JS (Mobile) */
+        .dropdown:hover .dropdown-content { display: block; }
 
         .dropdown-content a {
-            color: #cbd5e1;
+            color: white;
             padding: 12px 16px;
             text-decoration: none;
             display: block;
+            border-bottom: 1px solid #333;
             font-size: 14px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            cursor: pointer;
         }
 
-        .dropdown-content a:hover {
-            background: var(--primary);
-            color: white;
-        }
+        .dropdown-content a:hover { background: #2563eb; }
 
-        /* TITRE */
-        .hero-title {
-            height: 100vh;
+        /* TITRE CENTRAL */
+        .main-title {
             display: flex;
             justify-content: center;
             align-items: center;
+            height: 70vh;
         }
-        h1 { font-size: 5rem; color: white; text-shadow: 0 5px 15px rgba(0,0,0,0.7); margin: 0; }
+        h1 { color: white; font-size: 60px; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); margin: 0; }
 
-        /* FENETRE MODALE */
+        /* FENÊTRE MODALE */
         .modal {
-            display: none; position: fixed; z-index: 11000;
-            left: 0; top: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); align-items: center; justify-content: center;
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 100;
+            align-items: center; justify-content: center;
         }
-        .modal-content {
-            background: white; color: #1e293b; padding: 30px;
-            border-radius: 15px; width: 90%; max-width: 700px;
-            max-height: 80vh; overflow-y: auto; position: relative;
+        .modal-inner {
+            background: white; color: black;
+            padding: 30px; border-radius: 10px;
+            width: 80%; max-width: 600px;
+            position: relative;
         }
-        .close { position: absolute; top: 10px; right: 20px; font-size: 30px; cursor: pointer; color: #64748b; }
+        .close { position: absolute; top: 10px; right: 15px; font-size: 25px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="hero-bg"></div>
+    <div class="background-image"></div>
 
-    <nav>
-        <a href="#" style="color:white;"><i data-lucide="home"></i></a>
-        <div class="nav-center" id="main-menu"></div>
-        <a href="#" id="weather-link" style="color:white;"><i data-lucide="cloud-sun"></i></a>
-    </nav>
+    <div class="ui-layer">
+        <nav>
+            <i data-lucide="home" style="color:white;"></i>
+            <div class="menu-container" id="nav-menu">
+                </div>
+            <i data-lucide="cloud-sun" style="color:white;"></i>
+        </nav>
 
-    <div class="hero-title">
-        <h1>NASA Rando</h1>
+        <div class="main-title">
+            <h1>NASA Rando</h1>
+        </div>
     </div>
 
-    <div id="infoModal" class="modal">
-        <div class="modal-content">
+    <div id="myModal" class="modal">
+        <div class="modal-inner">
             <span class="close" onclick="closeModal()">&times;</span>
-            <h2 id="modalTitle" style="color:var(--primary); margin-top:0;"></h2>
-            <div id="modalBody" style="line-height:1.6; font-size:1.1rem; color:#334155;"></div>
+            <h2 id="modalTitle"></h2>
+            <div id="modalBody"></div>
         </div>
     </div>
 
     <script>
-        const CONFIG = {
-            themes: [
-                { titre: "1. Histoire & Bienfaits", liens: ["Histoire et Origines", "L'Épopée des GR", "Bienfaits de la Randonnée"] },
-                { titre: "2. Randos pour Tous", liens: ["Débuter sereinement", "Solo et Groupe", "En Famille", "Avec son Chien", "Randonnée Seniors", "Bivouac et Autonomie"] },
-                { titre: "3. Orientation", liens: ["La Carte Topographique", "Balisage des itinéraires", "La Boussole", "L’Altimètre", "Le GPS et le Numérique", "Méthodes Naturelles", "Logiciels de randonnée"] },
-                { titre: "4. Météo", liens: ["Comprendre les nuages", "Interpréter un bulletin", "Applications smartphone"] },
-                { titre: "5. Risques & Dangers", liens: ["Défaillance d’un membre", "Montées et Descentes", "Se perdre", "Chute de pierres", "Règle des 4F", "Les ampoules", "Le Mal Aigu des Montagnes (MAM)", "Rencontre animaux"] },
-                { titre: "6. Hygiène & Secours", liens: ["Hygiène corporelle", "Trousse de secours", "Gestes de premiers secours", "Déclencher un secours", "Kit de survie"] },
-                { titre: "7. Équipement", liens: ["Comment s’habiller", "Chaussures", "Bâtons de marche", "Sac à dos", "Les 11 essentiels"] },
-                { titre: "8. Alimentation", liens: ["Besoins Nutritionnels", "Hydratation", "Repas en Randonnée", "Astuces de Cuisson"] },
-                { titre: "9. Organisation", liens: ["Où trouver les infos", "Évaluer son temps de marche", "Meilleur moment pour démarrer", "Randonnée sans râler"] }
-            ]
-        };
-
-        const CONTENU_FICHES = {
-            "La Boussole": "<h3>L'art de l'azimut</h3><p>La boussole est indispensable pour s'orienter quand la visibilité baisse. Elle permet d'orienter la carte au Nord et de suivre une direction précise (l'azimut).</p>",
-            "Les 11 essentiels": "<h3>Liste de sécurité</h3><ol><li>Navigation</li><li>Lampe</li><li>Protection solaire</li><li>Premiers soins</li><li>Couteau</li><li>Feu</li><li>Abri</li><li>Eau</li><li>Nourriture</li><li>Vêtements</li><li>Sifflet</li></ol>",
-            "Méthodes Naturelles": "<h3>S'orienter avec les étoiles</h3><p>Repérez la Grande Ourse, reportez 5 fois la distance du bord extérieur de la casserole pour trouver l'Étoile Polaire. Elle indique le Nord.</p>"
-        };
-
-        const menuContainer = document.getElementById('main-menu');
-        CONFIG.themes.forEach(t => {
-            const div = document.createElement('div');
-            div.className = 'dropdown';
-            const buttonsHtml = t.liens.map(l => `<a onclick="openModal('${l.replace(/'/g, "\\'")}')">${l}</a>`).join('');
-            div.innerHTML = `<button class="dropbtn">${t.titre} ▾</button><div class="dropdown-content">${buttonsHtml}</div>`;
-            menuContainer.innerHTML += div.outerHTML;
-        });
-
-        function openModal(title) {
-            document.getElementById('modalTitle').innerText = title;
-            document.getElementById('modalBody').innerHTML = CONTENU_FICHES[title] || "<p>Cette fiche pratique est en cours de préparation. Elle sera disponible très bientôt sur NASA Rando.</p>";
-            document.getElementById('infoModal').style.display = 'flex';
-        }
-
-        function closeModal() { document.getElementById('infoModal').style.display = 'none'; }
-        window.onclick = function(event) { if (event.target == document.getElementById('infoModal')) closeModal(); }
-        lucide.createIcons();
-    </script>
-</body>
-</html>
+        const DATA = [
+            { t: "1. Histoire", s: ["Histoire et Origines", "L'Épopée des GR", "Bienfaits"] },
+            { t: "2. Randos Tous", s: ["Débuter", "Solo/Groupe", "En Famille", "Avec Chien", "Seniors", "Bivouac"] },
+            { t: "3. Orientation", s: ["La Carte", "Balisage", "La Boussole", "L’Altimètre", "GPS", "Méthodes Naturelles", "Logiciels"] },
+            { t: "4. Météo", s: ["Nuages", "Bulletins", "Apps Smartphone"] },
+            { t: "5. Risques", s: ["Défaillance", "Montées/Descentes", "Se perdre", "Chute de pierres", "Animaux", "MAM"] },
+            { t: "6. Secours", s: ["Hygiène", "Trousse", "Premiers secours", "Alerte"] },
+            { t: "7. Équipement", s: ["Hab
